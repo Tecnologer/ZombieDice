@@ -3,7 +3,6 @@ package models
 import (
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/tecnologer/dicegame/src/utils"
 )
 
@@ -61,22 +60,9 @@ func (d *Dice) String() string {
 }
 
 func (d *Dice) Println() {
-	color.New(d.printColor()).Println(d.Level)
+	fmt.Println(d.Level)
 }
 
 func (d *Dice) Print() {
-	color.New(d.printColor()).Print(d.Level)
-}
-
-func (d *Dice) printColor() color.Attribute {
-	switch d.Level {
-	case LevelEasy:
-		return color.FgGreen
-	case LevelMedium:
-		return color.FgYellow
-	case LevelHard:
-		return color.FgRed
-	}
-
-	return color.FgWhite
+	fmt.Print(d.Level)
 }

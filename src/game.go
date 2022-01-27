@@ -3,7 +3,6 @@ package dice
 import (
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	"github.com/tecnologer/dicegame/src/constants"
 	"github.com/tecnologer/dicegame/src/models"
@@ -133,7 +132,7 @@ func (g *Game) IsOver() bool {
 func (g *Game) IsNextPlayer() bool {
 	if g.turn.Won() {
 		fmt.Printf("El ganador es %s\n con %d cerebros en %d turnos\n",
-			color.CyanString(g.turn.Player.Name),
+			g.turn.Player.Name,
 			g.turn.getPlayerBrains(),
 			g.turn.number,
 		)
@@ -142,7 +141,7 @@ func (g *Game) IsNextPlayer() bool {
 	}
 
 	if g.turn.Lost() {
-		color.Red("perdiste el turno con %d disparos", g.turn.Shots)
+		fmt.Printf("perdiste el turno con %d disparos\n", g.turn.Shots)
 		utils.AskEnter("presiona enter para terminar tu turno...")
 		return true
 	}
@@ -152,10 +151,10 @@ func (g *Game) IsNextPlayer() bool {
 	// 	g.turn.Brains,
 	// 	g.turn.Shots,
 	// )
-	fmt.Printf("%s: en este turno llevas %s cerebros y %s disparos. Cerebros totales: %d.\n",
-		color.CyanString(g.turn.Player.Name),
-		color.GreenString("%d", g.turn.Brains),
-		color.RedString("%d", g.turn.Shots),
+	fmt.Printf("%s: en este turno llevas %d cerebros y %d disparos. Cerebros totales: %d.\n",
+		g.turn.Player.Name,
+		g.turn.Brains,
+		g.turn.Shots,
 		g.turn.Player.Brains,
 	)
 

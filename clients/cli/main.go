@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/fatih/color"
 	"github.com/sirupsen/logrus"
 	dice "github.com/tecnologer/dicegame/src"
 	"github.com/tecnologer/dicegame/src/utils"
@@ -46,7 +45,7 @@ func main() {
 		cmd := utils.AskString("Selecciona una opcion: ", "help")
 		callCmd(cmd)
 	}
-	color.Green("Fin del juego!")
+	logrus.Info("Fin del juego!")
 }
 
 func exitCmd() {
@@ -64,7 +63,7 @@ func callCmd(cmdKey string) {
 
 func helpCmd() {
 	for key, cmd := range cmds {
-		fmt.Printf("• %s: %s\n", color.CyanString("%s", key), color.YellowString("%s", cmd.info))
+		fmt.Printf("• %s: %s\n", key, cmd.info)
 	}
 	fmt.Println()
 }
