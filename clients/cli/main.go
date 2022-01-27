@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sirupsen/logrus"
+	lang "github.com/tecnologer/dicegame/language"
 	dice "github.com/tecnologer/dicegame/src"
 	"github.com/tecnologer/dicegame/src/utils"
 )
@@ -13,6 +14,7 @@ type cmdType struct {
 	action cmdAction
 	info   string
 }
+
 type cmdAction func()
 
 var (
@@ -20,16 +22,19 @@ var (
 	cmds = map[string]cmdType{
 		"salir": {
 			action: exitCmd,
-			info:   "Cierra el juego",
+			info:   "Closes the game",
 		},
 		"iniciar": {
 			action: start,
-			info:   "Inicia el juego",
+			info:   "Starts the game",
 		},
 	}
+	lFmt lang.DiceLanguage
 )
 
 func main() {
+	lFmt = lang.GetCurrent()
+
 	var verbose bool
 	flag.BoolVar(&verbose, "v", false, "enable verbose log")
 	flag.Parse()
@@ -38,14 +43,15 @@ func main() {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
+	logrus.Debug(lFmt)
 	logrus.SetReportCaller(true)
 
-	fmt.Println("Tip: puedes escribir \"help\" para mostrar las opciones disponibles")
+	lFmt.Printlnf("** Tip: you can type \"help\" to show the available options.")
 	for !exit {
-		cmd := utils.AskString("Selecciona una opcion: ", "help")
+		cmd := utils.AskString("Choose an option: ", "help")
 		callCmd(cmd)
 	}
-	logrus.Info("Fin del juego!")
+	logrus.Info("Game over!")
 }
 
 func exitCmd() {
@@ -63,16 +69,16 @@ func callCmd(cmdKey string) {
 
 func helpCmd() {
 	for key, cmd := range cmds {
-		fmt.Printf("• %s: %s\n", key, cmd.info)
+		lFmt.Printf("• %s: %s\n", key, cmd.info)
 	}
 	fmt.Println()
 }
 
 func getPlayers() []string {
-	playersNum := utils.AskInt("Cuantos jugadores seran? ", 1)
+	playersNum := utils.AskInt("How many players? ", 1)
 	players := make([]string, playersNum)
 	for i := 0; i < playersNum; i++ {
-		players[i] = utils.AskRequiredStringf("Nombre jugador %d: ", i+1)
+		players[i] = utils.AskRequiredStringf("Name of player #%d: ", i+1)
 	}
 
 	return players

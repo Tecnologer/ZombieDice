@@ -1,8 +1,6 @@
 package dice
 
 import (
-	"fmt"
-
 	"github.com/tecnologer/dicegame/src/constants"
 	"github.com/tecnologer/dicegame/src/models"
 )
@@ -29,7 +27,7 @@ func newTurn() *turn {
 //save sets the scores to the player
 func (t *turn) save() {
 	t.Player.Brains += t.Brains
-	fmt.Printf("%s tu turno termina, sumaste %d cerebros, tienes un total de %d\n",
+	lFmt.Printf("%s tu turno termina, sumaste %d cerebros, tienes un total de %d\n",
 		t.Player.Name,
 		t.Brains,
 		t.Player.Brains,

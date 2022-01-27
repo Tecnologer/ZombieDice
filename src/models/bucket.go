@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"strings"
 
+	lang "github.com/tecnologer/dicegame/language"
 	"github.com/tecnologer/dicegame/src/constants"
 	"github.com/tecnologer/dicegame/src/utils"
 )
 
+var lFmt lang.DiceLanguage
+
 type Bucket []*Dice
 
 func NewBucket(dices [constants.GameDiceCount]*Dice) *Bucket {
+	lFmt = lang.GetCurrent()
 	bucket := new(Bucket)
 	(*bucket) = append(*bucket, dices[0:]...)
 	return bucket

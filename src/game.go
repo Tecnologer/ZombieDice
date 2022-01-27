@@ -1,13 +1,14 @@
 package dice
 
 import (
-	"fmt"
-
 	"github.com/sirupsen/logrus"
+	lang "github.com/tecnologer/dicegame/language"
 	"github.com/tecnologer/dicegame/src/constants"
 	"github.com/tecnologer/dicegame/src/models"
 	"github.com/tecnologer/dicegame/src/utils"
 )
+
+var lFmt lang.DiceLanguage
 
 type Game struct {
 	turn      *turn
@@ -18,6 +19,8 @@ type Game struct {
 }
 
 func NewGame(playersName ...string) (game *Game) {
+	lFmt = lang.GetCurrent()
+
 	var players []*models.Player
 	if len(playersName) < 1 {
 		panic("se requieren al menos dos jugadores")
@@ -100,13 +103,13 @@ func (g *Game) GetDicesPicked() [3]*models.Dice {
 
 func (g *Game) Start() {
 	for !g.IsOver() {
-		fmt.Printf("Turno del jugador: %s\n", g.turn.Player.Name)
+		lFmt.Printf("Turno del jugador: %s\n", g.turn.Player.Name)
 
 		g.PickDices()
 
 		logrus.Debugf("dices in bucket: %d\n", len(*g.Bucket))
 
-		fmt.Println("Dados seleccionados:")
+		lFmt.Printlnf("Dados seleccionados:")
 		printDices(g.turn.Dices...)
 
 		g.rollDices()
@@ -131,7 +134,7 @@ func (g *Game) IsOver() bool {
 
 func (g *Game) IsNextPlayer() bool {
 	if g.turn.Won() {
-		fmt.Printf("El ganador es %s\n con %d cerebros en %d turnos\n",
+		lFmt.Printf("El ganador es %s\n con %d cerebros en %d turnos\n",
 			g.turn.Player.Name,
 			g.turn.getPlayerBrains(),
 			g.turn.number,
@@ -141,17 +144,17 @@ func (g *Game) IsNextPlayer() bool {
 	}
 
 	if g.turn.Lost() {
-		fmt.Printf("perdiste el turno con %d disparos\n", g.turn.Shots)
+		lFmt.Printf("perdiste el turno con %d disparos\n", g.turn.Shots)
 		utils.AskEnter("presiona enter para terminar tu turno...")
 		return true
 	}
 
 	playerWantsContinue := true
-	// fmt.Printf("en este turno tienes %d cerebros y %d disparos.\n",
+	// lFmt.Printf("en este turno tienes %d cerebros y %d disparos.\n",
 	// 	g.turn.Brains,
 	// 	g.turn.Shots,
 	// )
-	fmt.Printf("%s: en este turno llevas %d cerebros y %d disparos. Cerebros totales: %d.\n",
+	lFmt.Printf("%s: en este turno llevas %d cerebros y %d disparos. Cerebros totales: %d.\n",
 		g.turn.Player.Name,
 		g.turn.Brains,
 		g.turn.Shots,
@@ -207,7 +210,7 @@ func (g *Game) rollDices() {
 		}
 
 		side := dice.Roll()
-		fmt.Printf("dado #%d obtuvo %s\n", i+1, side)
+		lFmt.Printf("dado #%d obtuvo %s\n", i+1, side)
 		if side == models.Brain {
 			g.SetBrain()
 		} else if side == models.Shotgun {

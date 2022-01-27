@@ -6,9 +6,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	lang "github.com/tecnologer/dicegame/language"
 )
 
 var (
+	lFmt       = lang.GetCurrent()
 	reader     = bufio.NewReader(os.Stdin)
 	boolValues = map[string]bool{
 		"1":     true,
@@ -33,11 +36,11 @@ var (
 )
 
 func AskRequiredStringf(format string, values ...interface{}) string {
-	return AskRequiredString(fmt.Sprintf(format, values...))
+	return AskRequiredString(lFmt.Sprintf(format, values...))
 }
 
 func AskString(msg, defaultValue string) (input string) {
-	fmt.Print(msg)
+	lFmt.Printf(msg)
 	input, _ = reader.ReadString('\n')
 	input = strings.TrimSpace(input)
 
@@ -53,7 +56,7 @@ func AskRequiredString(msg string) (input string) {
 		input = AskString(msg, "")
 
 		if input == "" {
-			fmt.Println("Invalid input, try again.")
+			lFmt.Printlnf("Invalid input, try again.")
 		}
 	}
 
@@ -61,7 +64,7 @@ func AskRequiredString(msg string) (input string) {
 }
 
 func AskBoolf(format string, defaultValue bool, values ...interface{}) (input bool) {
-	return AskBool(fmt.Sprintf(format, values...), defaultValue)
+	return AskBool(lFmt.Sprintf(format, values...), defaultValue)
 }
 
 func AskBool(msg string, defaultValue bool) (input bool) {
