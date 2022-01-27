@@ -57,3 +57,7 @@ func (t *turn) Lost() bool {
 func (t *turn) getPlayerBrains() uint {
 	return t.Player.Brains + t.Brains
 }
+
+func (t *turn) isComputer() bool {
+	return t.Player.IsAI
+}

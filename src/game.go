@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"github.com/tecnologer/dicegame/src/constants"
 	"github.com/tecnologer/dicegame/src/models"
 	"github.com/tecnologer/dicegame/src/utils"
@@ -19,7 +20,7 @@ type Game struct {
 
 func NewGame(playersName ...string) (game *Game) {
 	var players []*models.Player
-	if len(playersName) < 2 {
+	if len(playersName) < 1 {
 		panic("se requieren al menos dos jugadores")
 	}
 	if len(playersName) > 0 {
@@ -27,8 +28,10 @@ func NewGame(playersName ...string) (game *Game) {
 		for i, player := range playersName {
 			players[i] = models.NewPlayer(player)
 		}
-	} else {
-		players = []*models.Player{models.NewPlayer("Player1"), models.NewPlayer("Player2")}
+	}
+
+	if len(players) == 1 {
+		players = append(players, models.NewPlayerIA("computadora"))
 	}
 
 	game = &Game{
@@ -102,7 +105,7 @@ func (g *Game) Start() {
 
 		g.PickDices()
 
-		fmt.Printf("dices in bucket: %d\n", len(*g.Bucket))
+		logrus.Debugf("dices in bucket: %d\n", len(*g.Bucket))
 
 		fmt.Println("Dados seleccionados:")
 		printDices(g.turn.Dices...)
@@ -130,7 +133,7 @@ func (g *Game) IsOver() bool {
 func (g *Game) IsNextPlayer() bool {
 	if g.turn.Won() {
 		fmt.Printf("El ganador es %s\n con %d cerebros en %d turnos\n",
-			g.turn.Player.Name,
+			color.CyanString(g.turn.Player.Name),
 			g.turn.getPlayerBrains(),
 			g.turn.number,
 		)
@@ -140,26 +143,35 @@ func (g *Game) IsNextPlayer() bool {
 
 	if g.turn.Lost() {
 		color.Red("perdiste el turno con %d disparos", g.turn.Shots)
+		utils.AskEnter("presiona enter para terminar tu turno...")
 		return true
 	}
 
-	// playerWantsContinue := true
+	playerWantsContinue := true
 	// fmt.Printf("en este turno tienes %d cerebros y %d disparos.\n",
 	// 	g.turn.Brains,
 	// 	g.turn.Shots,
 	// )
-	playerWantsContinue := utils.AskBoolf("%s: en este turno llevas %d cerebros y %d disparos. quieres continuar? (Si,No): ",
-		true,
-		g.turn.Player.Name,
-		g.turn.Brains,
-		g.turn.Shots,
+	fmt.Printf("%s: en este turno llevas %s cerebros y %s disparos. Cerebros totales: %d.\n",
+		color.CyanString(g.turn.Player.Name),
+		color.GreenString("%d", g.turn.Brains),
+		color.RedString("%d", g.turn.Shots),
+		g.turn.Player.Brains,
 	)
 
-	if !playerWantsContinue {
+	if g.turn.isComputer() {
+		playerWantsContinue = wanstAIEndTurn(g.turn.Player)
+	} else {
+		playerWantsContinue = utils.AskBoolf("quieres terminar tu turno? (Si,Default: No): ",
+			false,
+		)
+	}
+
+	if playerWantsContinue {
 		g.turn.save()
 	}
 
-	return !playerWantsContinue
+	return playerWantsContinue
 
 }
 

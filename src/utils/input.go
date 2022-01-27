@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -30,6 +31,10 @@ var (
 		"n":     false,
 	}
 )
+
+func AskRequiredStringf(format string, values ...interface{}) string {
+	return AskRequiredString(fmt.Sprintf(format, values...))
+}
 
 func AskString(msg, defaultValue string) (input string) {
 	fmt.Print(msg)
@@ -69,6 +74,20 @@ func AskBool(msg string, defaultValue bool) (input bool) {
 	input = parseInputToBool(inputStr)
 
 	return
+}
+
+func AskInt(msg string, defaultValue int) int {
+	inputStr := strings.ToLower(AskString(msg, fmt.Sprint(defaultValue)))
+	input, e := strconv.Atoi(inputStr)
+	if e != nil {
+		return defaultValue
+	}
+
+	return input
+}
+
+func AskEnter(msg string) {
+	_ = AskString(msg, "")
 }
 
 func parseInputToBool(input string) bool {
