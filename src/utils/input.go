@@ -68,9 +68,9 @@ func AskBoolf(format string, defaultValue bool, values ...interface{}) (input bo
 }
 
 func AskBool(msg string, defaultValue bool) (input bool) {
-	defaultStr := "no"
+	defaultStr := lFmt.Sprintf("no")
 	if defaultValue {
-		defaultStr = "yes"
+		defaultStr = lFmt.Sprintf("yes")
 	}
 
 	inputStr := strings.ToLower(AskString(msg, defaultStr))

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/tecnologer/dicegame/src/models"
+	"github.com/tecnologer/dicegame/src/utils"
 )
 
 func wanstAIEndTurn(computer *models.Player) bool {
@@ -22,5 +23,5 @@ func wanstAIEndTurn(computer *models.Player) bool {
 }
 
 func calculateProbability() int {
-	return 70
+	return utils.GetRandInt(100)
 }

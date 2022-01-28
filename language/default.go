@@ -1,8 +1,25 @@
 package lang
 
-import "github.com/tecnologer/dicegame/language/spa"
+import (
+	"strings"
+	"sync"
 
-var current DiceLanguage
+	"github.com/Xuanwo/go-locale"
+	"github.com/tecnologer/dicegame/language/eng"
+	"github.com/tecnologer/dicegame/language/spa"
+)
+
+var (
+	current DiceLanguage
+	spanish spa.Es419
+	english eng.UsEng
+
+	m *sync.Mutex
+)
+
+func init() {
+	m = &sync.Mutex{}
+}
 
 type DiceLanguage interface {
 	String() string
@@ -12,13 +29,18 @@ type DiceLanguage interface {
 }
 
 func getDefault() DiceLanguage {
-	// var english eng.UsEng
-	var english spa.Es419
-	current = english
+	s, err := locale.Detect()
+	if err == nil && strings.HasPrefix(s.String(), "es") {
+		return spanish
+	}
 	return english
 }
 
 func GetCurrent() DiceLanguage {
+	//TODO: check this
+	m.Lock()
+	defer m.Unlock()
+
 	if current == nil {
 		return getDefault()
 	}

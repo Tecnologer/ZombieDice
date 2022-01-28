@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	lang "github.com/tecnologer/dicegame/language"
 	dice "github.com/tecnologer/dicegame/src"
+	"github.com/tecnologer/dicegame/src/constants"
 	"github.com/tecnologer/dicegame/src/utils"
 )
 
@@ -19,21 +20,26 @@ type cmdAction func()
 
 var (
 	exit bool
-	cmds = map[string]cmdType{
-		"salir": {
-			action: exitCmd,
-			info:   "Closes the game",
-		},
-		"iniciar": {
-			action: start,
-			info:   "Starts the game",
-		},
-	}
 	lFmt lang.DiceLanguage
+	cmds map[string]cmdType
 )
 
 func main() {
 	lFmt = lang.GetCurrent()
+	cmds = map[string]cmdType{
+		lFmt.Sprintf("exit"): {
+			action: exitCmd,
+			info:   lFmt.Sprintf("Closes the game"),
+		},
+		lFmt.Sprintf("start"): {
+			action: start,
+			info:   lFmt.Sprintf("Starts the game"),
+		},
+		lFmt.Sprintf("rules"): {
+			action: printRules,
+			info:   lFmt.Sprintf("Displays the rules"),
+		},
+	}
 
 	var verbose bool
 	flag.BoolVar(&verbose, "v", false, "enable verbose log")
@@ -46,12 +52,12 @@ func main() {
 	logrus.Debug(lFmt)
 	logrus.SetReportCaller(true)
 
-	lFmt.Printlnf("** Tip: you can type \"help\" to show the available options.")
+	lFmt.Printlnf("** Tip: you can type \"help\" to show the available options.", lFmt.Sprintf("help"))
 	for !exit {
-		cmd := utils.AskString("Choose an option: ", "help")
+		cmd := utils.AskString("Choose an option: ", lFmt.Sprintf("help"))
 		callCmd(cmd)
 	}
-	logrus.Info("Game over!")
+	logrus.Info(lFmt.Sprintf("Game over!"))
 }
 
 func exitCmd() {
@@ -82,6 +88,10 @@ func getPlayers() []string {
 	}
 
 	return players
+}
+
+func printRules() {
+	lFmt.Printf(constants.Rules)
 }
 
 func start() {

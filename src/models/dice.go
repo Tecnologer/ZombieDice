@@ -60,9 +60,9 @@ func (d *Dice) String() string {
 }
 
 func (d *Dice) Println() {
-	fmt.Println(d.Level)
+	lFmt.Printlnf("%s", d.Level)
 }
 
 func (d *Dice) Print() {
-	fmt.Print(d.Level)
+	lFmt.Printf("%s", d.Level)
 }

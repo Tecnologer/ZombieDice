@@ -23,7 +23,7 @@ func NewGame(playersName ...string) (game *Game) {
 
 	var players []*models.Player
 	if len(playersName) < 1 {
-		panic("se requieren al menos dos jugadores")
+		panic(lFmt.Sprintf("It's necessary at least one player."))
 	}
 	if len(playersName) > 0 {
 		players = make([]*models.Player, len(playersName))
@@ -33,7 +33,7 @@ func NewGame(playersName ...string) (game *Game) {
 	}
 
 	if len(players) == 1 {
-		players = append(players, models.NewPlayerIA("computadora"))
+		players = append(players, models.NewPlayerIA(lFmt.Sprintf("computer")))
 	}
 
 	game = &Game{
@@ -103,13 +103,13 @@ func (g *Game) GetDicesPicked() [3]*models.Dice {
 
 func (g *Game) Start() {
 	for !g.IsOver() {
-		lFmt.Printf("Turno del jugador: %s\n", g.turn.Player.Name)
+		lFmt.Printf("Turn of player: %s\n", g.turn.Player.Name)
 
 		g.PickDices()
 
 		logrus.Debugf("dices in bucket: %d\n", len(*g.Bucket))
 
-		lFmt.Printlnf("Dados seleccionados:")
+		lFmt.Printlnf("Selected dices:")
 		printDices(g.turn.Dices...)
 
 		g.rollDices()
@@ -134,7 +134,7 @@ func (g *Game) IsOver() bool {
 
 func (g *Game) IsNextPlayer() bool {
 	if g.turn.Won() {
-		lFmt.Printf("El ganador es %s\n con %d cerebros en %d turnos\n",
+		lFmt.Printf("The winner is %s\n with %d brains in %d turns\n",
 			g.turn.Player.Name,
 			g.turn.getPlayerBrains(),
 			g.turn.number,
@@ -144,8 +144,8 @@ func (g *Game) IsNextPlayer() bool {
 	}
 
 	if g.turn.Lost() {
-		lFmt.Printf("perdiste el turno con %d disparos\n", g.turn.Shots)
-		utils.AskEnter("presiona enter para terminar tu turno...")
+		lFmt.Printf("Your turn ends with %d shotguns\n", g.turn.Shots)
+		utils.AskEnter("Press enter to end your turn...")
 		return true
 	}
 
@@ -154,7 +154,7 @@ func (g *Game) IsNextPlayer() bool {
 	// 	g.turn.Brains,
 	// 	g.turn.Shots,
 	// )
-	lFmt.Printf("%s: en este turno llevas %d cerebros y %d disparos. Cerebros totales: %d.\n",
+	lFmt.Printf("%s: on this turn, you've %d brains and %d shotguns. Total brains: %d.\n",
 		g.turn.Player.Name,
 		g.turn.Brains,
 		g.turn.Shots,
@@ -164,7 +164,7 @@ func (g *Game) IsNextPlayer() bool {
 	if g.turn.isComputer() {
 		playerWantsContinue = wanstAIEndTurn(g.turn.Player)
 	} else {
-		playerWantsContinue = utils.AskBoolf("quieres terminar tu turno? (Si,Default: No): ",
+		playerWantsContinue = utils.AskBoolf("Do you want to end your turn? (Yes, Default: No): ",
 			false,
 		)
 	}
@@ -210,7 +210,7 @@ func (g *Game) rollDices() {
 		}
 
 		side := dice.Roll()
-		lFmt.Printf("dado #%d obtuvo %s\n", i+1, side)
+		lFmt.Printf("Dice #%d gets %s\n", i+1, side)
 		if side == models.Brain {
 			g.SetBrain()
 		} else if side == models.Shotgun {
