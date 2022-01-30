@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option go_package = "/models/gproto";
+
+package proto;
+
+service Game {
+  rpc NewGame(NewGameRequest) returns (NewGameResponse) {}
+  rpc Join(JoinRequest) returns (JoinResponse) {}
+}
+
+message NewGameRequest {
+  string id = 1;
+  string name = 2;
+  string password = 3;
+}
+
+message NewGameResponse {
+  string id = 1;
+  string code = 2;
+  string host = 3;
+}
+
+message Player {
+  string id = 1;
+  string Name = 2;
+}
+
+message JoinRequest {
+  string host = 1;
+  string password = 2;
+  string playerName = 3;
+}
+
+message JoinResponse {
+  Player player = 1;
+  bool status = 2;
+}
