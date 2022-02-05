@@ -32,7 +32,7 @@ func NewGameClient(cc grpc.ClientConnInterface) GameClient {
 
 func (c *gameClient) NewGame(ctx context.Context, in *NewGameRequest, opts ...grpc.CallOption) (*NewGameResponse, error) {
 	out := new(NewGameResponse)
-	err := c.cc.Invoke(ctx, "/proto.Game/NewGame", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gproto.Game/NewGame", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (c *gameClient) NewGame(ctx context.Context, in *NewGameRequest, opts ...gr
 
 func (c *gameClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*JoinResponse, error) {
 	out := new(JoinResponse)
-	err := c.cc.Invoke(ctx, "/proto.Game/Join", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/gproto.Game/Join", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,14 +49,15 @@ func (c *gameClient) Join(ctx context.Context, in *JoinRequest, opts ...grpc.Cal
 }
 
 // GameServer is the server API for Game service.
-// All implementations should embed UnimplementedGameServer
+// All implementations must embed UnimplementedGameServer
 // for forward compatibility
 type GameServer interface {
 	NewGame(context.Context, *NewGameRequest) (*NewGameResponse, error)
 	Join(context.Context, *JoinRequest) (*JoinResponse, error)
+	mustEmbedUnimplementedGameServer()
 }
 
-// UnimplementedGameServer should be embedded to have forward compatible implementations.
+// UnimplementedGameServer must be embedded to have forward compatible implementations.
 type UnimplementedGameServer struct {
 }
 
@@ -66,6 +67,7 @@ func (UnimplementedGameServer) NewGame(context.Context, *NewGameRequest) (*NewGa
 func (UnimplementedGameServer) Join(context.Context, *JoinRequest) (*JoinResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Join not implemented")
 }
+func (UnimplementedGameServer) mustEmbedUnimplementedGameServer() {}
 
 // UnsafeGameServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to GameServer will
@@ -88,7 +90,7 @@ func _Game_NewGame_Handler(srv interface{}, ctx context.Context, dec func(interf
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Game/NewGame",
+		FullMethod: "/gproto.Game/NewGame",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameServer).NewGame(ctx, req.(*NewGameRequest))
@@ -106,7 +108,7 @@ func _Game_Join_Handler(srv interface{}, ctx context.Context, dec func(interface
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Game/Join",
+		FullMethod: "/gproto.Game/Join",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GameServer).Join(ctx, req.(*JoinRequest))
@@ -118,7 +120,7 @@ func _Game_Join_Handler(srv interface{}, ctx context.Context, dec func(interface
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Game_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Game",
+	ServiceName: "gproto.Game",
 	HandlerType: (*GameServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -131,5 +133,5 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "game.proto",
+	Metadata: "server/game.proto",
 }

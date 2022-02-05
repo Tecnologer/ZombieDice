@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-option go_package = "/models/gproto";
+option go_package = "server/models/gproto";
 
-package proto;
+package gproto;
 
 service Game {
   rpc NewGame(NewGameRequest) returns (NewGameResponse) {}
@@ -10,13 +10,11 @@ service Game {
 }
 
 message NewGameRequest {
-  string id = 1;
-  string name = 2;
   string password = 3;
+  int32 limitPlayers = 4;
 }
 
 message NewGameResponse {
-  string id = 1;
   string code = 2;
   string host = 3;
 }
@@ -29,7 +27,7 @@ message Player {
 message JoinRequest {
   string host = 1;
   string password = 2;
-  string playerName = 3;
+  Player player = 3;
 }
 
 message JoinResponse {
