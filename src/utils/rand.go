@@ -6,7 +6,11 @@ import (
 )
 
 func GetRandInt(limit int) int {
-	time.Sleep(1 * time.Millisecond)
-	r := rand.New(rand.NewSource(time.Now().Unix()))
-	return r.Intn(limit)
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(limit)
+}
+
+func GetRandIntRange(start, limit int) int {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(limit-start) + start
 }
