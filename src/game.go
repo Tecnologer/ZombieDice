@@ -1,6 +1,8 @@
 package dice
 
 import (
+	"errors"
+
 	"github.com/sirupsen/logrus"
 	lang "github.com/tecnologer/dicegame/language"
 	"github.com/tecnologer/dicegame/src/constants"
@@ -22,9 +24,9 @@ func NewGame(playersName ...string) (game *Game) {
 	lFmt = lang.GetCurrent()
 
 	var players []*models.Player
-	if len(playersName) < 1 {
-		panic(lFmt.Sprintf("It's necessary at least one player."))
-	}
+	// if len(playersName) < 1 {
+	// 	panic(lFmt.Sprintf("It's necessary at least one player."))
+	// }
 	if len(playersName) > 0 {
 		players = make([]*models.Player, len(playersName))
 		for i, player := range playersName {
@@ -32,9 +34,9 @@ func NewGame(playersName ...string) (game *Game) {
 		}
 	}
 
-	if len(players) == 1 {
-		players = append(players, models.NewPlayerIA(lFmt.Sprintf("computer")))
-	}
+	// if len(players) == 1 {
+	// 	players = append(players, models.NewPlayerIA(lFmt.Sprintf("computer")))
+	// }
 
 	game = &Game{
 		Players: players,
@@ -43,7 +45,7 @@ func NewGame(playersName ...string) (game *Game) {
 	}
 
 	game.Bucket = models.NewBucket(game.Dices)
-	game.NextPlayer()
+	// game.NextPlayer()
 	return
 }
 
@@ -71,6 +73,22 @@ func getDicesNewGame() [constants.GameDiceCount]*models.Dice {
 	return dices
 }
 
+func (g *Game) AddPlayer(player *models.Player) error {
+	if g.playerIsInGame(player) {
+		return errors.New(lFmt.Sprintf("The player %s is already in the game", player.Name))
+	}
+	g.Players = append(g.Players, player)
+	return nil
+}
+
+func (g *Game) playerIsInGame(player *models.Player) bool {
+	for _, p := range g.Players {
+		if p.Name == player.Name {
+			return true
+		}
+	}
+	return false
+}
 func (g *Game) PickDices() {
 	if !g.Bucket.HasEnougthDices() {
 		g.resetBucket()
