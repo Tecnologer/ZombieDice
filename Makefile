@@ -7,7 +7,6 @@ build-cli:
 	GOARCH=arm GOOS=linux go build -o dist/dicegame-cli-android clients/cli/main.go
 
 proto:
-	protoc --go_out=./server/models/proto \
-		--go_opt=paths=source_relative \
-		--go-grpc_out=require_unimplemented_servers=false:./server/models/proto \
-		--go-grpc_opt=paths=source_relative ./server/game.proto
+	protoc --go_out=. --go_opt=paths=import \
+    --go-grpc_out=. --go-grpc_opt=paths=import \
+    server/game.proto
