@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
 	lang "github.com/tecnologer/dicegame/language"
+	"github.com/tecnologer/dicegame/server/models/gproto"
 	dice "github.com/tecnologer/dicegame/src"
 	"github.com/tecnologer/dicegame/src/constants"
 	"github.com/tecnologer/dicegame/src/utils"
+	"google.golang.org/grpc"
 )
 
 type cmdType struct {
@@ -19,12 +22,29 @@ type cmdType struct {
 type cmdAction func()
 
 var (
-	exit bool
-	lFmt lang.DiceLanguage
-	cmds map[string]cmdType
+	exit   bool
+	lFmt   lang.DiceLanguage
+	cmds   map[string]cmdType
+	port   int
+	client gproto.GameClient
 )
 
 func main() {
+	flag.IntVar(&port, "port", 8088, "Port of the server")
+	flag.Parse()
+
+	host := fmt.Sprintf(":%d", port)
+	opts := []grpc.DialOption{
+		grpc.WithInsecure(),
+	}
+
+	connection, err := grpc.Dial(host, opts...)
+	if err != nil {
+		logrus.Fatalf("connecting to %s. Error: %v", host, err)
+	}
+	client = gproto.NewGameClient(connection)
+	logrus.Infof("connected to %s", host)
+
 	lFmt = lang.GetCurrent()
 	cmds = map[string]cmdType{
 		lFmt.Sprintf("exit"): {
@@ -38,6 +58,14 @@ func main() {
 		lFmt.Sprintf("rules"): {
 			action: printRules,
 			info:   lFmt.Sprintf("Displays the rules"),
+		},
+		lFmt.Sprintf("new-mp"): {
+			action: newMpHost,
+			info:   lFmt.Sprintf("Creates a new multiplayer game"),
+		},
+		lFmt.Sprintf("join-mp"): {
+			action: joinMpHost,
+			info:   lFmt.Sprintf("Joins to existing multiplayer game"),
 		},
 	}
 
@@ -88,6 +116,44 @@ func getPlayers() []string {
 	}
 
 	return players
+}
+
+func newMpHost() {
+	req := &gproto.NewGameRequest{
+		Player:       askPlayer(),
+		Password:     utils.AskString("Password (Enter, to be empty):", ""),
+		LimitPlayers: int32(utils.AskInt("Limit of players (Enter, to not limit): ", 0)),
+	}
+
+	res, err := client.NewGame(context.Background(), req)
+	if err != nil {
+		lFmt.Printlnf("Error on create new multiplayer host: %v", err)
+		return
+	}
+
+	lFmt.Printlnf("The multiplayer code is: %s.", res.Code)
+}
+
+func joinMpHost() {
+	req := &gproto.JoinRequest{
+		Player:   askPlayer(),
+		Code:     utils.AskRequiredString("Multiplayer Code: "),
+		Password: utils.AskString("Password (Enter, to be empty):", ""),
+	}
+
+	res, err := client.Join(context.Background(), req)
+	if err != nil {
+		lFmt.Printlnf("Cannot join to code %s, try again: Error: %v", req.Code, err)
+		return
+	}
+
+	lFmt.Printlnf("You joinen to %s as %s", req.Code, res.Player.Name)
+}
+
+func askPlayer() *gproto.Player {
+	return &gproto.Player{
+		Name: utils.AskRequiredString("Enter your name: "),
+	}
 }
 
 func printRules() {
