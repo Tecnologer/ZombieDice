@@ -3,9 +3,12 @@ package models
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
+	"github.com/sirupsen/logrus"
 	lang "github.com/tecnologer/dicegame/language"
+	"github.com/tecnologer/dicegame/server/models/gproto"
 	dice "github.com/tecnologer/dicegame/src"
 	dicemodels "github.com/tecnologer/dicegame/src/models"
 	"github.com/tecnologer/dicegame/src/utils"
@@ -63,6 +66,10 @@ func (g *games) getLimitPlayers(key string) int {
 	return g.current[key].limitPlayers
 }
 
+func (g *games) checkPassword(key, pwd string) bool {
+	return g.current[key].password == pwd
+}
+
 func InitGames() {
 	lock.Lock()
 	defer lock.Unlock()
@@ -73,16 +80,29 @@ func InitGames() {
 	}
 }
 
-func JoinToGame(key string, player *dicemodels.Player) error {
+func JoinToGame(key, pwd string, player *gproto.Player) error {
+	if player == nil {
+		return errors.New(tFmt.Sprintf("Player is required"))
+	}
+	key = strings.ToUpper(key)
 	if !actualGames.isThereGame(key) {
 		return errors.New(tFmt.Sprintf("There isn't a game with key '%s'", key))
+	}
+
+	if !actualGames.checkPassword(key, pwd) {
+		return errors.New(tFmt.Sprintf("The key '%s' or the password don't match.", key))
 	}
 
 	if actualGames.isLimitReached(key) {
 		return errors.New(tFmt.Sprintf("The game '%s' reached its limit of %d players.", key, actualGames.getLimitPlayers(key)))
 	}
 
-	return actualGames.joinPlayer(key, player)
+	err := actualGames.joinPlayer(key, parseProtoPlayerToPlayer(player))
+	if err != nil {
+		return err
+	}
+	logrus.Infof("Player '%s' joined to %s", player.Name, key)
+	return nil
 }
 
 func CreateGame(pwd string, limitPlayer int) string {
@@ -106,4 +126,8 @@ func generateKeyGame() (key string) {
 		key += fmt.Sprint(utils.GetRandInt(9))
 	}
 	return key
+}
+
+func parseProtoPlayerToPlayer(p *gproto.Player) *dicemodels.Player {
+	return dicemodels.NewPlayer(p.Name)
 }
