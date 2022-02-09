@@ -5,9 +5,12 @@ option go_package = "server/models/gproto";
 package gproto;
 
 service Game {
-  rpc NewGame(NewGameRequest) returns (NewGameResponse) {}
-  rpc Join(JoinRequest) returns (JoinResponse) {}
+  rpc NewGame(NewGameRequest) returns (Response) {}
+  rpc Join(JoinRequest) returns (Response) {}
+  rpc Notifications(RegisterNotifications) returns (stream Response);
 }
+
+message EmptyRequest{}
 
 message NewGameRequest {
   string password = 1;
@@ -16,8 +19,7 @@ message NewGameRequest {
 }
 
 message NewGameResponse {
-  string code = 2;
-  string host = 3;
+  string code = 1;
 }
 
 message Player {
@@ -31,7 +33,42 @@ message JoinRequest {
   Player player = 3;
 }
 
-message JoinResponse {
+message PlayerUpdate {
   Player player = 1;
   bool status = 2;
+}
+
+message GameOver {
+  Player winner = 1;
+  int32 turns = 2;
+  int32 brains = 3;
+}
+
+message NotificationResponse {  
+  enum NotificationType {
+    JOIN = 0;
+    LEFT = 1;
+    OVER = 2;
+    TURN = 3;
+  }
+
+  NotificationType type = 1;
+  oneof Content {
+      PlayerUpdate PlayerJoin = 2;      
+      PlayerUpdate PlayerLeft = 3;     
+      PlayerUpdate PlayerTurn = 4; 
+      GameOver GameOver = 5;
+  }
+}
+
+message RegisterNotifications {
+  string code = 1;
+}
+
+message Response {
+  oneof Content {
+    NewGameResponse NewGameResponse = 1;
+    PlayerUpdate JoinResponse = 2;
+    NotificationResponse Notification = 3;
+  }
 }

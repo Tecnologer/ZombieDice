@@ -26,9 +26,15 @@ type game struct {
 	*dice.Game
 	password     string
 	limitPlayers int
+	streams      []gproto.Game_NotificationsServer
 }
 type games struct {
 	current map[string]*game
+}
+
+type notification struct {
+	response *gproto.Response
+	code     string
 }
 
 func (g *games) isThereGame(key string) bool {
@@ -45,6 +51,7 @@ func (g *games) newGame(key, pwd string, limitPlayers int) {
 		Game:         dice.NewGame(),
 		password:     pwd,
 		limitPlayers: limitPlayers,
+		streams:      make([]gproto.Game_NotificationsServer, 0),
 	}
 
 }
@@ -68,6 +75,31 @@ func (g *games) getLimitPlayers(key string) int {
 
 func (g *games) checkPassword(key, pwd string) bool {
 	return g.current[key].password == pwd
+}
+
+func (g *games) sendNotification(notif *notification) {
+	notif.code = strings.ToUpper(notif.code)
+	if !g.isThereGame(notif.code) {
+		logrus.Warnf("there is not game with code %s, the notification couldn't send.")
+		return
+	}
+
+	for _, stream := range g.current[notif.code].streams {
+		e := stream.Send(notif.response)
+		if e != nil {
+			logrus.WithError(e).Warn("the notification couldn't send.")
+		}
+	}
+}
+
+func (g *games) addStream(key string, stream gproto.Game_NotificationsServer) {
+	key = strings.ToUpper(key)
+	if !g.isThereGame(key) {
+		logrus.Warnf("there is not game with code %s, couldn't register for notif.")
+		return
+	}
+
+	g.current[key].streams = append(g.current[key].streams, stream)
 }
 
 func InitGames() {

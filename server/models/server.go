@@ -13,17 +13,18 @@ import (
 	"google.golang.org/grpc"
 )
 
+// var (
+// 	notifications = make(chan *notification, 5)
+// )
+
 type DiceServer struct {
 	gproto.UnimplementedGameServer
 	host string
 }
 
-func (s DiceServer) NewGame(ctx context.Context, req *gproto.NewGameRequest) (*gproto.NewGameResponse, error) {
+func (s DiceServer) NewGame(ctx context.Context, req *gproto.NewGameRequest) (*gproto.Response, error) {
 	code := CreateGame(req.Password, int(req.LimitPlayers))
-	res := &gproto.NewGameResponse{
-		Code: code,
-		Host: s.host,
-	}
+	res := newGameResponse(code)
 
 	msg := "encrypted"
 	if req.Password == "" {
@@ -34,16 +35,26 @@ func (s DiceServer) NewGame(ctx context.Context, req *gproto.NewGameRequest) (*g
 	return res, nil
 }
 
-func (s DiceServer) Join(ctx context.Context, req *gproto.JoinRequest) (*gproto.JoinResponse, error) {
+func (s DiceServer) Join(ctx context.Context, req *gproto.JoinRequest) (*gproto.Response, error) {
 	err := JoinToGame(req.Code, req.Password, req.Player)
 	if err != nil {
 		return nil, err
 	}
-	res := &gproto.JoinResponse{
-		Player: req.Player,
-		Status: true,
-	}
+
+	res := newJoinResponse(req.Player, true)
+	actualGames.sendNotification(notifyNewJoin(req.Code, req.Player))
 	return res, nil
+}
+
+func (DiceServer) Notifications(req *gproto.RegisterNotifications, stream gproto.Game_NotificationsServer) error {
+	logrus.Debug("register for notifications")
+
+	actualGames.addStream(req.Code, stream)
+	<-stream.Context().Done()
+	// for notif := range notifications {
+	// 	actualGames.sendNotification(notif)
+	// }
+	return nil
 }
 
 func NewServer(port int) {
