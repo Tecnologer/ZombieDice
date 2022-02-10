@@ -8,6 +8,7 @@ service Game {
   rpc NewGame(NewGameRequest) returns (Response) {}
   rpc Join(JoinRequest) returns (Response) {}
   rpc Notifications(RegisterNotifications) returns (stream Response);
+  rpc Movement(MovementRequest) returns (Response){}
 }
 
 message EmptyRequest{}
@@ -70,5 +71,44 @@ message Response {
     NewGameResponse NewGameResponse = 1;
     PlayerUpdate JoinResponse = 2;
     NotificationResponse Notification = 3;
+    MovementResponse Movement = 4;
+  }
+}
+
+enum MovementType {
+  PICK = 0;
+  ROLL = 1;
+  OVER = 2;
+}
+
+enum DiceSide {
+  BRAIN = 0;
+  SHOTGUN = 1;
+  FOOTPRINTS = 2;
+}
+
+message Dice {
+  enum DiceLevel {
+    EASY = 0;
+    MEDIUM = 1;
+    HARD = 2;
+  }
+  DiceLevel Level = 1;
+  repeated DiceSide Sides = 2;
+}
+
+message MovementResponse {
+  MovementType type = 1;
+  oneof Movement {
+    Dice dice = 2;
+    DiceSide DiceSide = 3;
+  }
+}
+
+message MovementRequest {
+  MovementType type = 1;
+  string code = 2;
+  oneof Movement {
+    Dice dice = 3;
   }
 }

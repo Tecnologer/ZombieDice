@@ -13,9 +13,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-// var (
-// 	notifications = make(chan *notification, 5)
-// )
+var (
+	notifications = make(chan *notification, 5)
+)
 
 type DiceServer struct {
 	gproto.UnimplementedGameServer
@@ -42,7 +42,8 @@ func (s DiceServer) Join(ctx context.Context, req *gproto.JoinRequest) (*gproto.
 	}
 
 	res := newJoinResponse(req.Player, true)
-	actualGames.sendNotification(notifyNewJoin(req.Code, req.Player))
+	// actualGames.sendNotification(notifyNewJoin(req.Code, req.Player))
+	notifications <- notifyNewJoin(req.Code, req.Player)
 	return res, nil
 }
 
@@ -50,11 +51,19 @@ func (DiceServer) Notifications(req *gproto.RegisterNotifications, stream gproto
 	logrus.Debug("register for notifications")
 
 	actualGames.addStream(req.Code, stream)
-	<-stream.Context().Done()
-	// for notif := range notifications {
-	// 	actualGames.sendNotification(notif)
-	// }
+	// <-stream.Context().Done()
+	for notif := range notifications {
+		actualGames.sendNotification(notif)
+	}
 	return nil
+}
+
+func (DiceServer) Movement(ctx context.Context, req *gproto.MovementRequest) (*gproto.Response, error) {
+	switch req.Type {
+	case gproto.MovementType_PICK:
+		actualGames.pickDice(req.Code)
+	}
+	return nil, nil
 }
 
 func NewServer(port int) {

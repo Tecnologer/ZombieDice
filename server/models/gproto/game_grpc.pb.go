@@ -25,6 +25,7 @@ type GameClient interface {
 	NewGame(ctx context.Context, in *NewGameRequest, opts ...grpc.CallOption) (*Response, error)
 	Join(ctx context.Context, in *JoinRequest, opts ...grpc.CallOption) (*Response, error)
 	Notifications(ctx context.Context, in *RegisterNotifications, opts ...grpc.CallOption) (Game_NotificationsClient, error)
+	Movement(ctx context.Context, in *MovementRequest, opts ...grpc.CallOption) (*Response, error)
 }
 
 type gameClient struct {
@@ -85,6 +86,15 @@ func (x *gameNotificationsClient) Recv() (*Response, error) {
 	return m, nil
 }
 
+func (c *gameClient) Movement(ctx context.Context, in *MovementRequest, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := c.cc.Invoke(ctx, "/gproto.Game/Movement", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GameServer is the server API for Game service.
 // All implementations must embed UnimplementedGameServer
 // for forward compatibility
@@ -92,6 +102,7 @@ type GameServer interface {
 	NewGame(context.Context, *NewGameRequest) (*Response, error)
 	Join(context.Context, *JoinRequest) (*Response, error)
 	Notifications(*RegisterNotifications, Game_NotificationsServer) error
+	Movement(context.Context, *MovementRequest) (*Response, error)
 	mustEmbedUnimplementedGameServer()
 }
 
@@ -107,6 +118,9 @@ func (UnimplementedGameServer) Join(context.Context, *JoinRequest) (*Response, e
 }
 func (UnimplementedGameServer) Notifications(*RegisterNotifications, Game_NotificationsServer) error {
 	return status.Errorf(codes.Unimplemented, "method Notifications not implemented")
+}
+func (UnimplementedGameServer) Movement(context.Context, *MovementRequest) (*Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Movement not implemented")
 }
 func (UnimplementedGameServer) mustEmbedUnimplementedGameServer() {}
 
@@ -178,6 +192,24 @@ func (x *gameNotificationsServer) Send(m *Response) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Game_Movement_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MovementRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServer).Movement(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gproto.Game/Movement",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServer).Movement(ctx, req.(*MovementRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Game_ServiceDesc is the grpc.ServiceDesc for Game service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -192,6 +224,10 @@ var Game_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Join",
 			Handler:    _Game_Join_Handler,
+		},
+		{
+			MethodName: "Movement",
+			Handler:    _Game_Movement_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

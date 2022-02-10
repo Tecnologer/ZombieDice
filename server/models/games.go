@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -78,7 +77,6 @@ func (g *games) checkPassword(key, pwd string) bool {
 }
 
 func (g *games) sendNotification(notif *notification) {
-	notif.code = strings.ToUpper(notif.code)
 	if !g.isThereGame(notif.code) {
 		logrus.Warnf("there is not game with code %s, the notification couldn't send.")
 		return
@@ -93,13 +91,16 @@ func (g *games) sendNotification(notif *notification) {
 }
 
 func (g *games) addStream(key string, stream gproto.Game_NotificationsServer) {
-	key = strings.ToUpper(key)
 	if !g.isThereGame(key) {
 		logrus.Warnf("there is not game with code %s, couldn't register for notif.")
 		return
 	}
 
 	g.current[key].streams = append(g.current[key].streams, stream)
+}
+
+func (g *games) pickDice(key string) {
+
 }
 
 func InitGames() {
@@ -116,7 +117,6 @@ func JoinToGame(key, pwd string, player *gproto.Player) error {
 	if player == nil {
 		return errors.New(tFmt.Sprintf("Player is required"))
 	}
-	key = strings.ToUpper(key)
 	if !actualGames.isThereGame(key) {
 		return errors.New(tFmt.Sprintf("There isn't a game with key '%s'", key))
 	}

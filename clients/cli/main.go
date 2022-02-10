@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 	lang "github.com/tecnologer/dicegame/language"
@@ -30,6 +31,7 @@ var (
 	port   int
 	client gproto.GameClient
 	you    *gproto.Player
+	mpCode string
 )
 
 func main() {
@@ -140,6 +142,7 @@ func newMpHost() {
 		return
 	}
 
+	mpCode = newR.NewGameResponse.Code
 	go registerForNotifications(newR.NewGameResponse.Code)
 	lFmt.Printlnf("The multiplayer code is: %s.", newR.NewGameResponse.Code)
 }
@@ -147,7 +150,7 @@ func newMpHost() {
 func joinMpHost() {
 	req := &gproto.JoinRequest{
 		Player:   askPlayer(),
-		Code:     utils.AskRequiredString("Multiplayer Code: "),
+		Code:     askCode(),
 		Password: utils.AskString("Password (Enter, to be empty):", ""),
 	}
 
@@ -243,6 +246,11 @@ func registerForNotifications(code string) {
 			}
 		}
 	}
+}
+
+func askCode() string {
+	mpCode = strings.ToUpper(utils.AskRequiredString("Multiplayer Code: "))
+	return mpCode
 }
 
 // func stopNotifications() {

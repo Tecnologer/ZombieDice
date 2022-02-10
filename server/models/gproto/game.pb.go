@@ -20,6 +20,104 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type MovementType int32
+
+const (
+	MovementType_PICK MovementType = 0
+	MovementType_ROLL MovementType = 1
+	MovementType_OVER MovementType = 2
+)
+
+// Enum value maps for MovementType.
+var (
+	MovementType_name = map[int32]string{
+		0: "PICK",
+		1: "ROLL",
+		2: "OVER",
+	}
+	MovementType_value = map[string]int32{
+		"PICK": 0,
+		"ROLL": 1,
+		"OVER": 2,
+	}
+)
+
+func (x MovementType) Enum() *MovementType {
+	p := new(MovementType)
+	*p = x
+	return p
+}
+
+func (x MovementType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MovementType) Descriptor() protoreflect.EnumDescriptor {
+	return file_server_game_proto_enumTypes[0].Descriptor()
+}
+
+func (MovementType) Type() protoreflect.EnumType {
+	return &file_server_game_proto_enumTypes[0]
+}
+
+func (x MovementType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MovementType.Descriptor instead.
+func (MovementType) EnumDescriptor() ([]byte, []int) {
+	return file_server_game_proto_rawDescGZIP(), []int{0}
+}
+
+type DiceSide int32
+
+const (
+	DiceSide_BRAIN      DiceSide = 0
+	DiceSide_SHOTGUN    DiceSide = 1
+	DiceSide_FOOTPRINTS DiceSide = 2
+)
+
+// Enum value maps for DiceSide.
+var (
+	DiceSide_name = map[int32]string{
+		0: "BRAIN",
+		1: "SHOTGUN",
+		2: "FOOTPRINTS",
+	}
+	DiceSide_value = map[string]int32{
+		"BRAIN":      0,
+		"SHOTGUN":    1,
+		"FOOTPRINTS": 2,
+	}
+)
+
+func (x DiceSide) Enum() *DiceSide {
+	p := new(DiceSide)
+	*p = x
+	return p
+}
+
+func (x DiceSide) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DiceSide) Descriptor() protoreflect.EnumDescriptor {
+	return file_server_game_proto_enumTypes[1].Descriptor()
+}
+
+func (DiceSide) Type() protoreflect.EnumType {
+	return &file_server_game_proto_enumTypes[1]
+}
+
+func (x DiceSide) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DiceSide.Descriptor instead.
+func (DiceSide) EnumDescriptor() ([]byte, []int) {
+	return file_server_game_proto_rawDescGZIP(), []int{1}
+}
+
 type NotificationResponse_NotificationType int32
 
 const (
@@ -56,11 +154,11 @@ func (x NotificationResponse_NotificationType) String() string {
 }
 
 func (NotificationResponse_NotificationType) Descriptor() protoreflect.EnumDescriptor {
-	return file_server_game_proto_enumTypes[0].Descriptor()
+	return file_server_game_proto_enumTypes[2].Descriptor()
 }
 
 func (NotificationResponse_NotificationType) Type() protoreflect.EnumType {
-	return &file_server_game_proto_enumTypes[0]
+	return &file_server_game_proto_enumTypes[2]
 }
 
 func (x NotificationResponse_NotificationType) Number() protoreflect.EnumNumber {
@@ -70,6 +168,55 @@ func (x NotificationResponse_NotificationType) Number() protoreflect.EnumNumber 
 // Deprecated: Use NotificationResponse_NotificationType.Descriptor instead.
 func (NotificationResponse_NotificationType) EnumDescriptor() ([]byte, []int) {
 	return file_server_game_proto_rawDescGZIP(), []int{7, 0}
+}
+
+type Dice_DiceLevel int32
+
+const (
+	Dice_EASY   Dice_DiceLevel = 0
+	Dice_MEDIUM Dice_DiceLevel = 1
+	Dice_HARD   Dice_DiceLevel = 2
+)
+
+// Enum value maps for Dice_DiceLevel.
+var (
+	Dice_DiceLevel_name = map[int32]string{
+		0: "EASY",
+		1: "MEDIUM",
+		2: "HARD",
+	}
+	Dice_DiceLevel_value = map[string]int32{
+		"EASY":   0,
+		"MEDIUM": 1,
+		"HARD":   2,
+	}
+)
+
+func (x Dice_DiceLevel) Enum() *Dice_DiceLevel {
+	p := new(Dice_DiceLevel)
+	*p = x
+	return p
+}
+
+func (x Dice_DiceLevel) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Dice_DiceLevel) Descriptor() protoreflect.EnumDescriptor {
+	return file_server_game_proto_enumTypes[3].Descriptor()
+}
+
+func (Dice_DiceLevel) Type() protoreflect.EnumType {
+	return &file_server_game_proto_enumTypes[3]
+}
+
+func (x Dice_DiceLevel) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Dice_DiceLevel.Descriptor instead.
+func (Dice_DiceLevel) EnumDescriptor() ([]byte, []int) {
+	return file_server_game_proto_rawDescGZIP(), []int{10, 0}
 }
 
 type EmptyRequest struct {
@@ -628,6 +775,7 @@ type Response struct {
 	//	*Response_NewGameResponse
 	//	*Response_JoinResponse
 	//	*Response_Notification
+	//	*Response_Movement
 	Content isResponse_Content `protobuf_oneof:"Content"`
 }
 
@@ -691,6 +839,13 @@ func (x *Response) GetNotification() *NotificationResponse {
 	return nil
 }
 
+func (x *Response) GetMovement() *MovementResponse {
+	if x, ok := x.GetContent().(*Response_Movement); ok {
+		return x.Movement
+	}
+	return nil
+}
+
 type isResponse_Content interface {
 	isResponse_Content()
 }
@@ -707,11 +862,242 @@ type Response_Notification struct {
 	Notification *NotificationResponse `protobuf:"bytes,3,opt,name=Notification,proto3,oneof"`
 }
 
+type Response_Movement struct {
+	Movement *MovementResponse `protobuf:"bytes,4,opt,name=Movement,proto3,oneof"`
+}
+
 func (*Response_NewGameResponse) isResponse_Content() {}
 
 func (*Response_JoinResponse) isResponse_Content() {}
 
 func (*Response_Notification) isResponse_Content() {}
+
+func (*Response_Movement) isResponse_Content() {}
+
+type Dice struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Level Dice_DiceLevel `protobuf:"varint,1,opt,name=Level,proto3,enum=gproto.Dice_DiceLevel" json:"Level,omitempty"`
+	Sides []DiceSide     `protobuf:"varint,2,rep,packed,name=Sides,proto3,enum=gproto.DiceSide" json:"Sides,omitempty"`
+}
+
+func (x *Dice) Reset() {
+	*x = Dice{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_server_game_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Dice) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Dice) ProtoMessage() {}
+
+func (x *Dice) ProtoReflect() protoreflect.Message {
+	mi := &file_server_game_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Dice.ProtoReflect.Descriptor instead.
+func (*Dice) Descriptor() ([]byte, []int) {
+	return file_server_game_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *Dice) GetLevel() Dice_DiceLevel {
+	if x != nil {
+		return x.Level
+	}
+	return Dice_EASY
+}
+
+func (x *Dice) GetSides() []DiceSide {
+	if x != nil {
+		return x.Sides
+	}
+	return nil
+}
+
+type MovementResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type MovementType `protobuf:"varint,1,opt,name=type,proto3,enum=gproto.MovementType" json:"type,omitempty"`
+	// Types that are assignable to Movement:
+	//	*MovementResponse_Dice
+	//	*MovementResponse_DiceSide
+	Movement isMovementResponse_Movement `protobuf_oneof:"Movement"`
+}
+
+func (x *MovementResponse) Reset() {
+	*x = MovementResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_server_game_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MovementResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MovementResponse) ProtoMessage() {}
+
+func (x *MovementResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_server_game_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MovementResponse.ProtoReflect.Descriptor instead.
+func (*MovementResponse) Descriptor() ([]byte, []int) {
+	return file_server_game_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *MovementResponse) GetType() MovementType {
+	if x != nil {
+		return x.Type
+	}
+	return MovementType_PICK
+}
+
+func (m *MovementResponse) GetMovement() isMovementResponse_Movement {
+	if m != nil {
+		return m.Movement
+	}
+	return nil
+}
+
+func (x *MovementResponse) GetDice() *Dice {
+	if x, ok := x.GetMovement().(*MovementResponse_Dice); ok {
+		return x.Dice
+	}
+	return nil
+}
+
+func (x *MovementResponse) GetDiceSide() DiceSide {
+	if x, ok := x.GetMovement().(*MovementResponse_DiceSide); ok {
+		return x.DiceSide
+	}
+	return DiceSide_BRAIN
+}
+
+type isMovementResponse_Movement interface {
+	isMovementResponse_Movement()
+}
+
+type MovementResponse_Dice struct {
+	Dice *Dice `protobuf:"bytes,2,opt,name=dice,proto3,oneof"`
+}
+
+type MovementResponse_DiceSide struct {
+	DiceSide DiceSide `protobuf:"varint,3,opt,name=DiceSide,proto3,enum=gproto.DiceSide,oneof"`
+}
+
+func (*MovementResponse_Dice) isMovementResponse_Movement() {}
+
+func (*MovementResponse_DiceSide) isMovementResponse_Movement() {}
+
+type MovementRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type MovementType `protobuf:"varint,1,opt,name=type,proto3,enum=gproto.MovementType" json:"type,omitempty"`
+	Code string       `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	// Types that are assignable to Movement:
+	//	*MovementRequest_Dice
+	Movement isMovementRequest_Movement `protobuf_oneof:"Movement"`
+}
+
+func (x *MovementRequest) Reset() {
+	*x = MovementRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_server_game_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MovementRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MovementRequest) ProtoMessage() {}
+
+func (x *MovementRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_server_game_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MovementRequest.ProtoReflect.Descriptor instead.
+func (*MovementRequest) Descriptor() ([]byte, []int) {
+	return file_server_game_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *MovementRequest) GetType() MovementType {
+	if x != nil {
+		return x.Type
+	}
+	return MovementType_PICK
+}
+
+func (x *MovementRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (m *MovementRequest) GetMovement() isMovementRequest_Movement {
+	if m != nil {
+		return m.Movement
+	}
+	return nil
+}
+
+func (x *MovementRequest) GetDice() *Dice {
+	if x, ok := x.GetMovement().(*MovementRequest_Dice); ok {
+		return x.Dice
+	}
+	return nil
+}
+
+type isMovementRequest_Movement interface {
+	isMovementRequest_Movement()
+}
+
+type MovementRequest_Dice struct {
+	Dice *Dice `protobuf:"bytes,3,opt,name=dice,proto3,oneof"`
+}
+
+func (*MovementRequest_Dice) isMovementRequest_Movement() {}
 
 var File_server_game_proto protoreflect.FileDescriptor
 
@@ -775,7 +1161,7 @@ var file_server_game_proto_rawDesc = []byte{
 	0x4e, 0x10, 0x03, 0x42, 0x09, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x2b,
 	0x0a, 0x15, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69,
 	0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22, 0xda, 0x01, 0x0a, 0x08,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x92, 0x02, 0x0a, 0x08,
 	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x43, 0x0a, 0x0f, 0x4e, 0x65, 0x77, 0x47,
 	0x61, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x17, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4e, 0x65, 0x77, 0x47, 0x61,
@@ -788,21 +1174,61 @@ var file_server_game_proto_rawDesc = []byte{
 	0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32,
 	0x1c, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63,
 	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48, 0x00, 0x52,
-	0x0c, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0x09, 0x0a,
-	0x07, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x32, 0xb2, 0x01, 0x0a, 0x04, 0x47, 0x61, 0x6d,
-	0x65, 0x12, 0x35, 0x0a, 0x07, 0x4e, 0x65, 0x77, 0x47, 0x61, 0x6d, 0x65, 0x12, 0x16, 0x2e, 0x67,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4e, 0x65, 0x77, 0x47, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x2f, 0x0a, 0x04, 0x4a, 0x6f, 0x69, 0x6e,
-	0x12, 0x13, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4a, 0x6f, 0x69, 0x6e, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x42, 0x0a, 0x0d, 0x4e, 0x6f, 0x74,
-	0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x1d, 0x2e, 0x67, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x6f, 0x74, 0x69,
-	0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x1a, 0x10, 0x2e, 0x67, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x30, 0x01, 0x42, 0x16, 0x5a,
-	0x14, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x73, 0x2f, 0x67,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x0c, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x36, 0x0a,
+	0x08, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x18, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48, 0x00, 0x52, 0x08, 0x4d, 0x6f, 0x76,
+	0x65, 0x6d, 0x65, 0x6e, 0x74, 0x42, 0x09, 0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
+	0x22, 0x89, 0x01, 0x0a, 0x04, 0x44, 0x69, 0x63, 0x65, 0x12, 0x2c, 0x0a, 0x05, 0x4c, 0x65, 0x76,
+	0x65, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x16, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2e, 0x44, 0x69, 0x63, 0x65, 0x2e, 0x44, 0x69, 0x63, 0x65, 0x4c, 0x65, 0x76, 0x65, 0x6c,
+	0x52, 0x05, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x12, 0x26, 0x0a, 0x05, 0x53, 0x69, 0x64, 0x65, 0x73,
+	0x18, 0x02, 0x20, 0x03, 0x28, 0x0e, 0x32, 0x10, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x44, 0x69, 0x63, 0x65, 0x53, 0x69, 0x64, 0x65, 0x52, 0x05, 0x53, 0x69, 0x64, 0x65, 0x73, 0x22,
+	0x2b, 0x0a, 0x09, 0x44, 0x69, 0x63, 0x65, 0x4c, 0x65, 0x76, 0x65, 0x6c, 0x12, 0x08, 0x0a, 0x04,
+	0x45, 0x41, 0x53, 0x59, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x4d, 0x45, 0x44, 0x49, 0x55, 0x4d,
+	0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x48, 0x41, 0x52, 0x44, 0x10, 0x02, 0x22, 0x9c, 0x01, 0x0a,
+	0x10, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x28, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x14, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e,
+	0x74, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x22, 0x0a, 0x04, 0x64,
+	0x69, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x67, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x2e, 0x44, 0x69, 0x63, 0x65, 0x48, 0x00, 0x52, 0x04, 0x64, 0x69, 0x63, 0x65, 0x12,
+	0x2e, 0x0a, 0x08, 0x44, 0x69, 0x63, 0x65, 0x53, 0x69, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x0e, 0x32, 0x10, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x44, 0x69, 0x63, 0x65, 0x53,
+	0x69, 0x64, 0x65, 0x48, 0x00, 0x52, 0x08, 0x44, 0x69, 0x63, 0x65, 0x53, 0x69, 0x64, 0x65, 0x42,
+	0x0a, 0x0a, 0x08, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x7f, 0x0a, 0x0f, 0x4d,
+	0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x28,
+	0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x14, 0x2e, 0x67,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79,
+	0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x22, 0x0a, 0x04,
+	0x64, 0x69, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x67, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2e, 0x44, 0x69, 0x63, 0x65, 0x48, 0x00, 0x52, 0x04, 0x64, 0x69, 0x63, 0x65,
+	0x42, 0x0a, 0x0a, 0x08, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x2a, 0x2c, 0x0a, 0x0c,
+	0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12, 0x08, 0x0a, 0x04,
+	0x50, 0x49, 0x43, 0x4b, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x52, 0x4f, 0x4c, 0x4c, 0x10, 0x01,
+	0x12, 0x08, 0x0a, 0x04, 0x4f, 0x56, 0x45, 0x52, 0x10, 0x02, 0x2a, 0x32, 0x0a, 0x08, 0x44, 0x69,
+	0x63, 0x65, 0x53, 0x69, 0x64, 0x65, 0x12, 0x09, 0x0a, 0x05, 0x42, 0x52, 0x41, 0x49, 0x4e, 0x10,
+	0x00, 0x12, 0x0b, 0x0a, 0x07, 0x53, 0x48, 0x4f, 0x54, 0x47, 0x55, 0x4e, 0x10, 0x01, 0x12, 0x0e,
+	0x0a, 0x0a, 0x46, 0x4f, 0x4f, 0x54, 0x50, 0x52, 0x49, 0x4e, 0x54, 0x53, 0x10, 0x02, 0x32, 0xeb,
+	0x01, 0x0a, 0x04, 0x47, 0x61, 0x6d, 0x65, 0x12, 0x35, 0x0a, 0x07, 0x4e, 0x65, 0x77, 0x47, 0x61,
+	0x6d, 0x65, 0x12, 0x16, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4e, 0x65, 0x77, 0x47,
+	0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x67, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x2f,
+	0x0a, 0x04, 0x4a, 0x6f, 0x69, 0x6e, 0x12, 0x13, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e,
+	0x4a, 0x6f, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x67, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x42, 0x0a, 0x0d, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x12, 0x1d, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
+	0x65, 0x72, 0x4e, 0x6f, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x1a,
+	0x10, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x30, 0x01, 0x12, 0x37, 0x0a, 0x08, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e, 0x74, 0x12,
+	0x17, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4d, 0x6f, 0x76, 0x65, 0x6d, 0x65, 0x6e,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x67, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x16, 0x5a, 0x14,
+	0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x2f, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x73, 0x2f, 0x67, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -817,45 +1243,61 @@ func file_server_game_proto_rawDescGZIP() []byte {
 	return file_server_game_proto_rawDescData
 }
 
-var file_server_game_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_server_game_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_server_game_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_server_game_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_server_game_proto_goTypes = []interface{}{
-	(NotificationResponse_NotificationType)(0), // 0: gproto.NotificationResponse.NotificationType
-	(*EmptyRequest)(nil),                       // 1: gproto.EmptyRequest
-	(*NewGameRequest)(nil),                     // 2: gproto.NewGameRequest
-	(*NewGameResponse)(nil),                    // 3: gproto.NewGameResponse
-	(*Player)(nil),                             // 4: gproto.Player
-	(*JoinRequest)(nil),                        // 5: gproto.JoinRequest
-	(*PlayerUpdate)(nil),                       // 6: gproto.PlayerUpdate
-	(*GameOver)(nil),                           // 7: gproto.GameOver
-	(*NotificationResponse)(nil),               // 8: gproto.NotificationResponse
-	(*RegisterNotifications)(nil),              // 9: gproto.RegisterNotifications
-	(*Response)(nil),                           // 10: gproto.Response
+	(MovementType)(0), // 0: gproto.MovementType
+	(DiceSide)(0),     // 1: gproto.DiceSide
+	(NotificationResponse_NotificationType)(0), // 2: gproto.NotificationResponse.NotificationType
+	(Dice_DiceLevel)(0),                        // 3: gproto.Dice.DiceLevel
+	(*EmptyRequest)(nil),                       // 4: gproto.EmptyRequest
+	(*NewGameRequest)(nil),                     // 5: gproto.NewGameRequest
+	(*NewGameResponse)(nil),                    // 6: gproto.NewGameResponse
+	(*Player)(nil),                             // 7: gproto.Player
+	(*JoinRequest)(nil),                        // 8: gproto.JoinRequest
+	(*PlayerUpdate)(nil),                       // 9: gproto.PlayerUpdate
+	(*GameOver)(nil),                           // 10: gproto.GameOver
+	(*NotificationResponse)(nil),               // 11: gproto.NotificationResponse
+	(*RegisterNotifications)(nil),              // 12: gproto.RegisterNotifications
+	(*Response)(nil),                           // 13: gproto.Response
+	(*Dice)(nil),                               // 14: gproto.Dice
+	(*MovementResponse)(nil),                   // 15: gproto.MovementResponse
+	(*MovementRequest)(nil),                    // 16: gproto.MovementRequest
 }
 var file_server_game_proto_depIdxs = []int32{
-	4,  // 0: gproto.NewGameRequest.player:type_name -> gproto.Player
-	4,  // 1: gproto.JoinRequest.player:type_name -> gproto.Player
-	4,  // 2: gproto.PlayerUpdate.player:type_name -> gproto.Player
-	4,  // 3: gproto.GameOver.winner:type_name -> gproto.Player
-	0,  // 4: gproto.NotificationResponse.type:type_name -> gproto.NotificationResponse.NotificationType
-	6,  // 5: gproto.NotificationResponse.PlayerJoin:type_name -> gproto.PlayerUpdate
-	6,  // 6: gproto.NotificationResponse.PlayerLeft:type_name -> gproto.PlayerUpdate
-	6,  // 7: gproto.NotificationResponse.PlayerTurn:type_name -> gproto.PlayerUpdate
-	7,  // 8: gproto.NotificationResponse.GameOver:type_name -> gproto.GameOver
-	3,  // 9: gproto.Response.NewGameResponse:type_name -> gproto.NewGameResponse
-	6,  // 10: gproto.Response.JoinResponse:type_name -> gproto.PlayerUpdate
-	8,  // 11: gproto.Response.Notification:type_name -> gproto.NotificationResponse
-	2,  // 12: gproto.Game.NewGame:input_type -> gproto.NewGameRequest
-	5,  // 13: gproto.Game.Join:input_type -> gproto.JoinRequest
-	9,  // 14: gproto.Game.Notifications:input_type -> gproto.RegisterNotifications
-	10, // 15: gproto.Game.NewGame:output_type -> gproto.Response
-	10, // 16: gproto.Game.Join:output_type -> gproto.Response
-	10, // 17: gproto.Game.Notifications:output_type -> gproto.Response
-	15, // [15:18] is the sub-list for method output_type
-	12, // [12:15] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	7,  // 0: gproto.NewGameRequest.player:type_name -> gproto.Player
+	7,  // 1: gproto.JoinRequest.player:type_name -> gproto.Player
+	7,  // 2: gproto.PlayerUpdate.player:type_name -> gproto.Player
+	7,  // 3: gproto.GameOver.winner:type_name -> gproto.Player
+	2,  // 4: gproto.NotificationResponse.type:type_name -> gproto.NotificationResponse.NotificationType
+	9,  // 5: gproto.NotificationResponse.PlayerJoin:type_name -> gproto.PlayerUpdate
+	9,  // 6: gproto.NotificationResponse.PlayerLeft:type_name -> gproto.PlayerUpdate
+	9,  // 7: gproto.NotificationResponse.PlayerTurn:type_name -> gproto.PlayerUpdate
+	10, // 8: gproto.NotificationResponse.GameOver:type_name -> gproto.GameOver
+	6,  // 9: gproto.Response.NewGameResponse:type_name -> gproto.NewGameResponse
+	9,  // 10: gproto.Response.JoinResponse:type_name -> gproto.PlayerUpdate
+	11, // 11: gproto.Response.Notification:type_name -> gproto.NotificationResponse
+	15, // 12: gproto.Response.Movement:type_name -> gproto.MovementResponse
+	3,  // 13: gproto.Dice.Level:type_name -> gproto.Dice.DiceLevel
+	1,  // 14: gproto.Dice.Sides:type_name -> gproto.DiceSide
+	0,  // 15: gproto.MovementResponse.type:type_name -> gproto.MovementType
+	14, // 16: gproto.MovementResponse.dice:type_name -> gproto.Dice
+	1,  // 17: gproto.MovementResponse.DiceSide:type_name -> gproto.DiceSide
+	0,  // 18: gproto.MovementRequest.type:type_name -> gproto.MovementType
+	14, // 19: gproto.MovementRequest.dice:type_name -> gproto.Dice
+	5,  // 20: gproto.Game.NewGame:input_type -> gproto.NewGameRequest
+	8,  // 21: gproto.Game.Join:input_type -> gproto.JoinRequest
+	12, // 22: gproto.Game.Notifications:input_type -> gproto.RegisterNotifications
+	16, // 23: gproto.Game.Movement:input_type -> gproto.MovementRequest
+	13, // 24: gproto.Game.NewGame:output_type -> gproto.Response
+	13, // 25: gproto.Game.Join:output_type -> gproto.Response
+	13, // 26: gproto.Game.Notifications:output_type -> gproto.Response
+	13, // 27: gproto.Game.Movement:output_type -> gproto.Response
+	24, // [24:28] is the sub-list for method output_type
+	20, // [20:24] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_server_game_proto_init() }
@@ -984,6 +1426,42 @@ func file_server_game_proto_init() {
 				return nil
 			}
 		}
+		file_server_game_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Dice); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_server_game_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MovementResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_server_game_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MovementRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_server_game_proto_msgTypes[7].OneofWrappers = []interface{}{
 		(*NotificationResponse_PlayerJoin)(nil),
@@ -995,14 +1473,22 @@ func file_server_game_proto_init() {
 		(*Response_NewGameResponse)(nil),
 		(*Response_JoinResponse)(nil),
 		(*Response_Notification)(nil),
+		(*Response_Movement)(nil),
+	}
+	file_server_game_proto_msgTypes[11].OneofWrappers = []interface{}{
+		(*MovementResponse_Dice)(nil),
+		(*MovementResponse_DiceSide)(nil),
+	}
+	file_server_game_proto_msgTypes[12].OneofWrappers = []interface{}{
+		(*MovementRequest_Dice)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_server_game_proto_rawDesc,
-			NumEnums:      1,
-			NumMessages:   10,
+			NumEnums:      4,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
