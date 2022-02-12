@@ -8,10 +8,10 @@ service Game {
   rpc NewGame(NewGameRequest) returns (Response) {}
   rpc Join(JoinRequest) returns (Response) {}
   rpc Notifications(RegisterNotifications) returns (stream Response);
-  rpc Movement(MovementRequest) returns (Response){}
+  rpc Movement(MovementRequest) returns (Response) {}
 }
 
-message EmptyRequest{}
+message EmptyRequest {}
 
 message NewGameRequest {
   string password = 1;
@@ -19,9 +19,7 @@ message NewGameRequest {
   Player player = 3;
 }
 
-message NewGameResponse {
-  string code = 1;
-}
+message NewGameResponse { string code = 1; }
 
 message Player {
   string id = 1;
@@ -44,27 +42,38 @@ message GameOver {
   int32 turns = 2;
   int32 brains = 3;
 }
+message TurnOver {
+  int32 shotguns = 1;
+  int32 brains = 2;
+}
+message RollDice {
+  Dice dice = 1;
+  DiceSide side = 2;
+}
 
-message NotificationResponse {  
+message NotificationResponse {
   enum NotificationType {
     JOIN = 0;
     LEFT = 1;
     OVER = 2;
     TURN = 3;
+    PICK = 4;
+    ROLL = 5;
   }
 
   NotificationType type = 1;
   oneof Content {
-      PlayerUpdate PlayerJoin = 2;      
-      PlayerUpdate PlayerLeft = 3;     
-      PlayerUpdate PlayerTurn = 4; 
-      GameOver GameOver = 5;
+    PlayerUpdate PlayerJoin = 2;
+    PlayerUpdate PlayerLeft = 3;
+    PlayerUpdate PlayerTurn = 4;
+    GameOver GameOver = 5;
+    Dice DicePick = 6;
+    TurnOver TurnOver = 7;
+    RollDice RollDice = 8;
   }
 }
 
-message RegisterNotifications {
-  string code = 1;
-}
+message RegisterNotifications { string code = 1; }
 
 message Response {
   oneof Content {
@@ -101,14 +110,12 @@ message MovementResponse {
   MovementType type = 1;
   oneof Movement {
     Dice dice = 2;
-    DiceSide DiceSide = 3;
+    RollDice rollDice = 3;
   }
 }
 
 message MovementRequest {
   MovementType type = 1;
   string code = 2;
-  oneof Movement {
-    Dice dice = 3;
-  }
+  Dice dice = 3;
 }

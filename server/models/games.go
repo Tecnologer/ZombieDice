@@ -1,10 +1,11 @@
 package models
 
 import (
-	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	lang "github.com/tecnologer/dicegame/language"
 	"github.com/tecnologer/dicegame/server/models/gproto"
@@ -99,8 +100,14 @@ func (g *games) addStream(key string, stream gproto.Game_NotificationsServer) {
 	g.current[key].streams = append(g.current[key].streams, stream)
 }
 
-func (g *games) pickDice(key string) {
+func (g *games) pickDice(key string) (*gproto.Dice, error) {
+	key = strings.ToUpper(key)
+	if !g.isThereGame(key) {
+		return nil, errors.Errorf("there is not game with code %s.", key)
+	}
 
+	dice := g.current[key].Game.Bucket.PickRandomDice()
+	return diceToProtoDice(dice), nil
 }
 
 func InitGames() {

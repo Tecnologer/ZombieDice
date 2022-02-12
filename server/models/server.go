@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -61,7 +62,20 @@ func (DiceServer) Notifications(req *gproto.RegisterNotifications, stream gproto
 func (DiceServer) Movement(ctx context.Context, req *gproto.MovementRequest) (*gproto.Response, error) {
 	switch req.Type {
 	case gproto.MovementType_PICK:
-		actualGames.pickDice(req.Code)
+		dice, err := actualGames.pickDice(req.Code)
+		if err != nil {
+			return nil, err
+		}
+		notifications <- notifyPickDice(req.Code, dice)
+		return newDiceResponse(dice), nil
+	case gproto.MovementType_ROLL:
+		if req.Dice == nil {
+			return nil, errors.New("the dice is require to roll it")
+		}
+		dice := protoDiceToDice(req.Dice)
+		side := dice.Roll()
+		notifications <- notifyRollDice(req.Code, req.Dice, side)
+		return newRollDiceResponse(side), nil
 	}
 	return nil, nil
 }
