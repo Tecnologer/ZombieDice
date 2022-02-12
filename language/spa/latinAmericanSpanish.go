@@ -47,6 +47,9 @@ var (
 		constants.Rules:                        rules,
 		"There isn't a game with key '%s'":     "No hay juego para la clave '%s'",
 		"The player %s is already in the game": "El jugador %s ya esta en el juego",
+		"Singleplayer":                         "Un solo jugador",
+		"Multiplayer":                          "Multi-jugador",
+		"Playername":                           "Nombre del jugador",
 	}
 )
 
