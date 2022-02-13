@@ -26,7 +26,7 @@ type game struct {
 	*dice.Game
 	password     string
 	limitPlayers int
-	streams      []gproto.Game_NotificationsServer
+	streams      map[string]gproto.Game_NotificationsServer
 }
 type games struct {
 	current map[string]*game
@@ -35,6 +35,7 @@ type games struct {
 type notification struct {
 	response *gproto.Response
 	code     string
+	player   *gproto.Player
 }
 
 func (g *games) isThereGame(key string) bool {
@@ -51,7 +52,7 @@ func (g *games) newGame(key, pwd string, limitPlayers int) {
 		Game:         dice.NewGame(),
 		password:     pwd,
 		limitPlayers: limitPlayers,
-		streams:      make([]gproto.Game_NotificationsServer, 0),
+		streams:      make(map[string]gproto.Game_NotificationsServer),
 	}
 
 }
@@ -83,7 +84,10 @@ func (g *games) sendNotification(notif *notification) {
 		return
 	}
 
-	for _, stream := range g.current[notif.code].streams {
+	for playerName, stream := range g.current[notif.code].streams {
+		if playerName == notif.player.Name {
+			continue
+		}
 		e := stream.Send(notif.response)
 		if e != nil {
 			logrus.WithError(e).Warn("the notification couldn't send.")
@@ -91,13 +95,22 @@ func (g *games) sendNotification(notif *notification) {
 	}
 }
 
-func (g *games) addStream(key string, stream gproto.Game_NotificationsServer) {
+func (g *games) addStream(key string, player *gproto.Player, stream gproto.Game_NotificationsServer) {
 	if !g.isThereGame(key) {
 		logrus.Warnf("there is not game with code %s, couldn't register for notif.")
 		return
 	}
 
-	g.current[key].streams = append(g.current[key].streams, stream)
+	g.current[key].streams[player.Name] = stream
+}
+
+func (g *games) removeStream(key string, player *gproto.Player) {
+	if !g.isThereGame(key) {
+		logrus.Warnf("there is not game with code %s, couldn't remove notif.")
+		return
+	}
+
+	delete(g.current[key].streams, player.Name)
 }
 
 func (g *games) pickDice(key string) (*gproto.Dice, error) {
@@ -108,6 +121,20 @@ func (g *games) pickDice(key string) (*gproto.Dice, error) {
 
 	dice := g.current[key].Game.Bucket.PickRandomDice()
 	return diceToProtoDice(dice), nil
+}
+
+func (g *games) nextPlayer(key string) (end *dice.Turn, next *dice.Turn, err error) {
+	key = strings.ToUpper(key)
+	if !g.isThereGame(key) {
+		return nil, nil, errors.Errorf("there is not game with code %s.", key)
+	}
+	//get score of the curren player
+	end = g.current[key].GetTurn()
+
+	//select next player
+	g.current[key].Game.NextPlayer()
+	next = g.current[key].GetTurn()
+	return
 }
 
 func InitGames() {

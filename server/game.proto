@@ -45,7 +45,9 @@ message GameOver {
 message TurnOver {
   int32 shotguns = 1;
   int32 brains = 2;
+  Player nextPlayer = 3;
 }
+
 message RollDice {
   Dice dice = 1;
   DiceSide side = 2;
@@ -73,7 +75,10 @@ message NotificationResponse {
   }
 }
 
-message RegisterNotifications { string code = 1; }
+message RegisterNotifications {
+  string code = 1;
+  Player player = 2;
+}
 
 message Response {
   oneof Content {
@@ -118,4 +123,5 @@ message MovementRequest {
   MovementType type = 1;
   string code = 2;
   Dice dice = 3;
+  Player ownPlayer = 4;
 }

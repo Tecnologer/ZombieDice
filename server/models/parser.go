@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/tecnologer/dicegame/server/models/gproto"
+	dice "github.com/tecnologer/dicegame/src"
 	"github.com/tecnologer/dicegame/src/models"
 )
 
@@ -16,9 +17,10 @@ func newJoinResponse(player *gproto.Player, status bool) *gproto.Response {
 	}
 }
 
-func notifyNewJoin(code string, player *gproto.Player) *notification {
+func notifyNewJoin(code string, ownPlayer, player *gproto.Player) *notification {
 	return &notification{
-		code: code,
+		code:   code,
+		player: ownPlayer,
 		response: &gproto.Response{
 			Content: &gproto.Response_Notification{
 				Notification: &gproto.NotificationResponse{
@@ -79,9 +81,10 @@ func newDiceResponse(dice *gproto.Dice) *gproto.Response {
 	}
 }
 
-func notifyPickDice(code string, dice *gproto.Dice) *notification {
+func notifyPickDice(code string, ownPlayer *gproto.Player, dice *gproto.Dice) *notification {
 	return &notification{
-		code: code,
+		code:   code,
+		player: ownPlayer,
 		response: &gproto.Response{
 			Content: &gproto.Response_Notification{
 				Notification: &gproto.NotificationResponse{
@@ -110,9 +113,10 @@ func newRollDiceResponse(side models.DiceSide) *gproto.Response {
 	}
 }
 
-func notifyRollDice(code string, dice *gproto.Dice, side models.DiceSide) *notification {
+func notifyRollDice(code string, ownPlayer *gproto.Player, dice *gproto.Dice, side models.DiceSide) *notification {
 	return &notification{
-		code: code,
+		code:   code,
+		player: ownPlayer,
 		response: &gproto.Response{
 			Content: &gproto.Response_Notification{
 				Notification: &gproto.NotificationResponse{
@@ -126,5 +130,60 @@ func notifyRollDice(code string, dice *gproto.Dice, side models.DiceSide) *notif
 				},
 			},
 		},
+	}
+}
+func notifyPlayerLeft(code string, ownPlayer, player *gproto.Player) *notification {
+	return &notification{
+		code:   code,
+		player: ownPlayer,
+		response: &gproto.Response{
+			Content: &gproto.Response_Notification{
+				Notification: &gproto.NotificationResponse{
+					Type: gproto.NotificationResponse_LEFT,
+					Content: &gproto.NotificationResponse_PlayerLeft{
+						PlayerLeft: &gproto.PlayerUpdate{
+							Player: player,
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func nextPlayerResponse(player *gproto.Player) *gproto.Response {
+	return &gproto.Response{
+		Content: &gproto.Response_Movement{
+			Movement: &gproto.MovementResponse{
+				Type: gproto.MovementType_OVER,
+			},
+		},
+	}
+}
+
+func notifyNextPlayer(code string, ownPlayer *gproto.Player, endTurn, nextTurn *dice.Turn) *notification {
+	return &notification{
+		code:   code,
+		player: ownPlayer,
+		response: &gproto.Response{
+			Content: &gproto.Response_Notification{
+				Notification: &gproto.NotificationResponse{
+					Type: gproto.NotificationResponse_TURN,
+					Content: &gproto.NotificationResponse_TurnOver{
+						TurnOver: &gproto.TurnOver{
+							Shotguns:   int32(endTurn.Brains),
+							Brains:     int32(endTurn.Brains),
+							NextPlayer: parsePlayerToProtoPlayer(nextTurn.Player),
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func parsePlayerToProtoPlayer(player *models.Player) *gproto.Player {
+	return &gproto.Player{
+		Name: player.Name,
 	}
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/tecnologer/dicegame/src/models"
 )
 
-type turn struct {
+type Turn struct {
 	number     uint
 	Player     *models.Player
 	Brains     uint
@@ -14,8 +14,8 @@ type turn struct {
 	Dices      []*models.Dice
 }
 
-func newTurn() *turn {
-	return &turn{
+func newTurn() *Turn {
+	return &Turn{
 		Player:     nil,
 		Brains:     0,
 		Shots:      0,
@@ -25,7 +25,7 @@ func newTurn() *turn {
 }
 
 //save sets the scores to the player
-func (t *turn) save() {
+func (t *Turn) save() {
 	t.Player.Brains += t.Brains
 	lFmt.Printf("%s tu turno termina, sumaste %d cerebros, tienes un total de %d\n",
 		t.Player.Name,
@@ -35,7 +35,7 @@ func (t *turn) save() {
 }
 
 //setPlayer set the player's turn and reset the turn's scores
-func (t *turn) setPlayer(player *models.Player) {
+func (t *Turn) setPlayer(player *models.Player) {
 	t.number++
 	t.Player = player
 	t.Brains = 0
@@ -44,18 +44,22 @@ func (t *turn) setPlayer(player *models.Player) {
 	t.Dices = []*models.Dice{}
 }
 
-func (t *turn) Won() bool {
-	return t.getPlayerBrains() >= constants.BrainCount
+func (t *Turn) Won() bool {
+	return t.GetPlayerBrains() >= constants.BrainCount
 }
 
-func (t *turn) Lost() bool {
+func (t *Turn) Lost() bool {
 	return t.Shots >= constants.ShotgunsCount
 }
 
-func (t *turn) getPlayerBrains() uint {
+func (t *Turn) GetPlayerBrains() uint {
 	return t.Player.Brains + t.Brains
 }
 
-func (t *turn) isComputer() bool {
+func (t *Turn) IsComputer() bool {
 	return t.Player.IsAI
+}
+
+func (t *Turn) GetPlayer() *models.Player {
+	return t.Player
 }

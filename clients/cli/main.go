@@ -190,7 +190,8 @@ func start() {
 
 func registerForNotifications(code string) {
 	req := &gproto.RegisterNotifications{
-		Code: code,
+		Code:   code,
+		Player: you,
 	}
 	stream, err := client.Notifications(context.Background(), req)
 	if err != nil {

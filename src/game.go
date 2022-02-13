@@ -13,7 +13,7 @@ import (
 var lFmt lang.DiceLanguage
 
 type Game struct {
-	turn      *turn
+	turn      *Turn
 	Players   []*models.Player
 	Dices     [constants.GameDiceCount]*models.Dice
 	Bucket    *models.Bucket
@@ -154,7 +154,7 @@ func (g *Game) IsNextPlayer() bool {
 	if g.turn.Won() {
 		lFmt.Printf("The winner is %s\n with %d brains in %d turns\n",
 			g.turn.Player.Name,
-			g.turn.getPlayerBrains(),
+			g.turn.GetPlayerBrains(),
 			g.turn.number,
 		)
 		g.IsStopped = true
@@ -179,7 +179,7 @@ func (g *Game) IsNextPlayer() bool {
 		g.turn.Player.Brains,
 	)
 
-	if g.turn.isComputer() {
+	if g.turn.IsComputer() {
 		playerWantsContinue = wanstAIEndTurn(g.turn.Player)
 	} else {
 		playerWantsContinue = utils.AskBoolf("Do you want to end your turn? (Yes, Default: No): ",
@@ -238,6 +238,14 @@ func (g *Game) rollDices() {
 		}
 	}
 	g.turn.Dices = newPicked
+}
+
+func (g *Game) GetCurrentPlayer() *models.Player {
+	return g.turn.Player
+}
+
+func (g *Game) GetTurn() *Turn {
+	return g.turn
 }
 
 func (g *Game) resetBucket() {

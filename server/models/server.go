@@ -44,40 +44,68 @@ func (s DiceServer) Join(ctx context.Context, req *gproto.JoinRequest) (*gproto.
 
 	res := newJoinResponse(req.Player, true)
 	// actualGames.sendNotification(notifyNewJoin(req.Code, req.Player))
-	notifications <- notifyNewJoin(req.Code, req.Player)
+	notifications <- notifyNewJoin(req.Code, req.Player, req.Player)
 	return res, nil
 }
 
 func (DiceServer) Notifications(req *gproto.RegisterNotifications, stream gproto.Game_NotificationsServer) error {
 	logrus.Debug("register for notifications")
 
-	actualGames.addStream(req.Code, stream)
-	// <-stream.Context().Done()
+	actualGames.addStream(req.Code, req.Player, stream)
+	go func() {
+		//if the stream is closed, then we assume the player left the server
+		<-stream.Context().Done()
+		logrus.Infof("player %s left", req.Player.Name)
+		actualGames.removeStream(req.Code, req.Player)
+		notifications <- notifyPlayerLeft(req.Code, req.Player, req.Player)
+	}()
+
 	for notif := range notifications {
 		actualGames.sendNotification(notif)
 	}
+
 	return nil
 }
 
-func (DiceServer) Movement(ctx context.Context, req *gproto.MovementRequest) (*gproto.Response, error) {
+func (s DiceServer) Movement(ctx context.Context, req *gproto.MovementRequest) (*gproto.Response, error) {
 	switch req.Type {
 	case gproto.MovementType_PICK:
-		dice, err := actualGames.pickDice(req.Code)
-		if err != nil {
-			return nil, err
-		}
-		notifications <- notifyPickDice(req.Code, dice)
-		return newDiceResponse(dice), nil
+		s.pickDice(req.Code, req.OwnPlayer)
 	case gproto.MovementType_ROLL:
-		if req.Dice == nil {
-			return nil, errors.New("the dice is require to roll it")
-		}
-		dice := protoDiceToDice(req.Dice)
-		side := dice.Roll()
-		notifications <- notifyRollDice(req.Code, req.Dice, side)
-		return newRollDiceResponse(side), nil
+		return s.rollDice(req.Code, req.OwnPlayer, req.Dice)
+	case gproto.MovementType_OVER:
+		return s.nextPlayer(req.Code, req.OwnPlayer)
 	}
 	return nil, nil
+}
+
+func (DiceServer) pickDice(code string, ownPlayer *gproto.Player) (*gproto.Response, error) {
+	dice, err := actualGames.pickDice(code)
+	if err != nil {
+		return nil, err
+	}
+	notifications <- notifyPickDice(code, ownPlayer, dice)
+	return newDiceResponse(dice), nil
+}
+
+func (DiceServer) rollDice(code string, ownPlayer *gproto.Player, gDice *gproto.Dice) (*gproto.Response, error) {
+	if gDice == nil {
+		return nil, errors.New("the dice is require to roll it")
+	}
+	dice := protoDiceToDice(gDice)
+	side := dice.Roll()
+	notifications <- notifyRollDice(code, ownPlayer, gDice, side)
+	return newRollDiceResponse(side), nil
+}
+
+func (DiceServer) nextPlayer(code string, ownPlayer *gproto.Player) (*gproto.Response, error) {
+	endTurn, nextTurn, err := actualGames.nextPlayer(code)
+	if err != nil {
+		return nil, err
+	}
+	notifications <- notifyNextPlayer(code, ownPlayer, endTurn, nextTurn)
+	nextPlayer := parsePlayerToProtoPlayer(nextTurn.Player)
+	return nextPlayerResponse(nextPlayer), nil
 }
 
 func NewServer(port int) {
