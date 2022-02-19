@@ -42,6 +42,12 @@ func (g *games) isThereGame(key string) bool {
 	_, exists := g.current[key]
 	return exists
 }
+func (g *games) existsGame(key string) error {
+	if !g.isThereGame(key) {
+		return errors.Errorf("there is not game with code %s", key)
+	}
+	return nil
+}
 
 func (g *games) newGame(key, pwd string, limitPlayers int) {
 	//if the game is already created
@@ -60,6 +66,7 @@ func (g *games) newGame(key, pwd string, limitPlayers int) {
 func (g *games) joinPlayer(key string, player *dicemodels.Player) error {
 	return g.current[key].AddPlayer(player)
 }
+
 func (g *games) isLimitReached(key string) bool {
 	limit := g.getLimitPlayers(key)
 	//there is not limit
@@ -79,8 +86,8 @@ func (g *games) checkPassword(key, pwd string) bool {
 }
 
 func (g *games) sendNotification(notif *notification) {
-	if !g.isThereGame(notif.code) {
-		logrus.Warnf("there is not game with code %s, the notification couldn't send.")
+	if err := g.existsGame(notif.code); err != nil {
+		logrus.WithError(err).Warn("notification couldn't send")
 		return
 	}
 
@@ -105,8 +112,8 @@ func (g *games) addStream(key string, player *gproto.Player, stream gproto.Game_
 }
 
 func (g *games) removeStream(key string, player *gproto.Player) {
-	if !g.isThereGame(key) {
-		logrus.Warnf("there is not game with code %s, couldn't remove notif.")
+	if err := g.existsGame(key); err != nil {
+		logrus.WithError(err).Warn("notification couldn't be removed")
 		return
 	}
 
@@ -115,8 +122,8 @@ func (g *games) removeStream(key string, player *gproto.Player) {
 
 func (g *games) pickDice(key string) (*gproto.Dice, error) {
 	key = strings.ToUpper(key)
-	if !g.isThereGame(key) {
-		return nil, errors.Errorf("there is not game with code %s.", key)
+	if err := g.existsGame(key); err != nil {
+		return nil, errors.Wrap(err, "dice not picked")
 	}
 
 	dice := g.current[key].Game.Bucket.PickRandomDice()
@@ -125,9 +132,10 @@ func (g *games) pickDice(key string) (*gproto.Dice, error) {
 
 func (g *games) nextPlayer(key string) (end *dice.Turn, next *dice.Turn, err error) {
 	key = strings.ToUpper(key)
-	if !g.isThereGame(key) {
-		return nil, nil, errors.Errorf("there is not game with code %s.", key)
+	if err := g.existsGame(key); err != nil {
+		return nil, nil, errors.Wrap(err, "cannot select next player")
 	}
+
 	//get score of the curren player
 	end = g.current[key].GetTurn()
 
@@ -151,8 +159,9 @@ func JoinToGame(key, pwd string, player *gproto.Player) error {
 	if player == nil {
 		return errors.New(tFmt.Sprintf("Player is required"))
 	}
-	if !actualGames.isThereGame(key) {
-		return errors.New(tFmt.Sprintf("There isn't a game with key '%s'", key))
+
+	if err := actualGames.existsGame(key); err != nil {
+		return errors.Wrap(err, "cannot join")
 	}
 
 	if !actualGames.checkPassword(key, pwd) {
